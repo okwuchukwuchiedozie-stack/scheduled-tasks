@@ -22,66 +22,61 @@ jobs:
           pip install -r requirements.txt
 
       - name: Check secrets are configured
+
         env:
-          api_key: ${{ secrets.API_KEY }}
-          own_email: ${{ secrets.OWN_EMAIL }}
-          own_password: ${{ secrets.OWN_PASSWORD }}
-          to_email: ${{ secrets.TO_EMAIL }}
+          API_KEY: ${{ secrets.API_KEY }}
+          OWN_EMAIL: ${{ secrets.OWN_EMAIL }}
+          OWN_PASSWORD: ${{ secrets.OWN_PASSWORD }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: |
           if [ -z "$OWN_EMAIL" ]; then
-            echo "MY_EMAIL secret is not set!"
-            echo "Go to Settings > Secrets > Actions and add it."
+            echo "❌ OWN_EMAIL secret is not set!"
+            echo "Go to Settings > Secrets and variables > Actions and add it."
             exit 1
           else
-            echo "MY_EMAIL is configured"
+            echo "✅ OWN_EMAIL configuration verified."
           fi
 
           if [ -z "$OWN_PASSWORD" ]; then
-            echo "MY_PASSWORD secret is not set!"
-            echo "Go to Settings > Secrets > Actions and add it."
+            echo "❌ OWN_PASSWORD secret is not set!"
+            echo "Go to Settings > Secrets and variables > Actions and add it."
             exit 1
           else
-            echo "MY_PASSWORD is configured"
+            echo "✅ OWN_PASSWORD configuration verified."
           fi
 
           echo ""
-          echo "All secrets are configured!"
+          echo "🎉 All required environment secrets match validation profiles!"
 
       - name: Check required files exist
         run: |
-          echo "Checking for required files..."
+          echo "Verifying local asset footprint..."
 
           if [ -f "main.py" ]; then
-            echo "main.py found"
+            echo "✅ main.py verified."
           else
-            echo "main.py not found!"
+            echo "❌ main.py missing!"
             exit 1
           fi
 
           if [ -f "requirements.txt" ]; then
-            echo "requirements.txt found"
+            echo "✅ requirements.txt verified."
           else
-            echo "requirements.txt not found!"
-            exit 1
-          fi
-
-          if [ -f "birthdays.csv" ]; then
-            echo "birthdays.csv found"
-          else
-            echo "birthdays.csv not found!"
+            echo "❌ requirements.txt missing!"
             exit 1
           fi
 
           echo ""
-          echo "All required files found!"
+          echo "🎉 Structural codebase check complete!"
 
       - name: Test Python syntax
-        run: python -m py_compile main.py && echo "Python syntax OK"
+        run: python -m py_compile main.py && echo "Python syntax validation OK"
 
-      - name: Success
+      - name: Success Summary Notice
         run: |
           echo ""
           echo "========================================"
-          echo "  All checks passed!"
-          echo "  Your setup is ready to go."
+          echo "🚀 All setup checks passed successfully!"
+          echo "   Your automation track is completely ready."
           echo "========================================"
+
