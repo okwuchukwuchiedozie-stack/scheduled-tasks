@@ -21,7 +21,7 @@ on:
 
 jobs:
   run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -41,6 +41,7 @@ jobs:
         env:
           # Your secrets are available as environment variables
           # Add more secrets in Settings > Secrets > Actions
+          api_key: ${{ secrets.API_KEY }}
           own_email: ${{ secrets.OWN_EMAIL }}
           own_password: ${{ secrets.OWN_PASSWORD }}
           to_email: ${{ secrets.TO_EMAIL }}
