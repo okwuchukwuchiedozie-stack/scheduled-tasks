@@ -28,8 +28,6 @@ jobs:
       - name: Run script
         env:
           API_KEY: ${{ secrets.API_KEY }}
-          OWN_EMAIL: ${{ secrets.OWN_EMAIL }}
-          OWN_PASSWORD: ${{ secrets.OWN_PASSWORD }}
-          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python main.py
 
