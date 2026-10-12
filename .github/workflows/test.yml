@@ -5,7 +5,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -23,6 +23,7 @@ jobs:
 
       - name: Check secrets are configured
         env:
+          api_key: ${{ secrets.API_KEY }}
           own_email: ${{ secrets.OWN_EMAIL }}
           own_password: ${{ secrets.OWN_PASSWORD }}
           to_email: ${{ secrets.TO_EMAIL }}
