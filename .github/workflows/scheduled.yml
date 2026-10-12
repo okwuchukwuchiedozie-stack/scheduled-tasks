@@ -2,7 +2,6 @@ name: Daily Script
 
 on:
   schedule:
-    # Triggers precisely at 06:00 UTC daily (7:00 AM West Africa Time)
     - cron: '0 6 * * *'
 
   workflow_dispatch: # Allows frictionless manual overrides from the UI button
@@ -13,12 +12,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -26,10 +26,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run script
-       
         env:
           API_KEY: ${{ secrets.API_KEY }}
           OWN_EMAIL: ${{ secrets.OWN_EMAIL }}
           OWN_PASSWORD: ${{ secrets.OWN_PASSWORD }}
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: python main.py
+
