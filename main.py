@@ -55,8 +55,8 @@ try:
 
         print("📨 Dispatching webhook payload to Discord channel over HTTPS (Port 443)...")
         webhook_response = requests.post(discord_webhook_url, json=payload, timeout=15)
-        
-        if webhook_response.status_code in:
+
+        if 200 <= webhook_response.status_code < 300:
             print("🚀 Notification successfully pushed to Discord client canvas!")
         else:
             print(f"❌ Webhook communication failed with status: {webhook_response.status_code}")
@@ -72,4 +72,3 @@ except requests.RequestException as network_fail:
 except Exception as unexpected_error:
     print(f"⚠️ Critical System Error encountered: {unexpected_error}")
     exit(1)
-
