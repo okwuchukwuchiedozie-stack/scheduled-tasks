@@ -1,22 +1,17 @@
 import os
-import smtplib
 import requests
-import time
 import datetime as dt
-from email.message import EmailMessage
 
 print(f"⏰ Execution Timestamp: {dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-print("🛰️ Initializing COR-Precipitation-Notifier Status Sweeps...")
+print("🛰️ Initializing COR-Precipitation-Notifier Workspace...")
 
 OWM_Endpoint = "https://api.openweathermap.org/data/2.5/forecast"
 api_key = os.environ.get("API_KEY")
-own_email = os.environ.get("OWN_EMAIL")
-own_password = os.environ.get("OWN_PASSWORD")
-to_email = os.environ.get("TO_EMAIL")
+discord_webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
 
-if not all([api_key, own_email, own_password, to_email]):
-    print("❌ CRITICAL SETUP ERROR: One or more environment secrets are completely missing.")
-    print("👉 Verify your key names are fully capitalized in your GitHub Actions Secrets panel.")
+if not api_key or not discord_webhook_url:
+    print("❌ CRITICAL SETUP ERROR: One or more required environment variables are completely missing.")
+    print("👉 Verify your key names are capitalized in your GitHub Actions Secrets panel.")
     exit(1)
 
 MY_LAT = 6.4549
@@ -39,7 +34,6 @@ try:
 
     if "list" not in weather_data:
         print("❌ TELEMETRY SCHEMA ERROR: OpenWeatherMap did not return a valid forecast track.")
-        print(f"💬 API Payload Context Response: {weather_data}")
         exit(1)
 
     will_rain = False
@@ -55,51 +49,27 @@ try:
     if will_rain:
         print(f"🌧️ Precipitation vector confirmed over sector target area. Lowest Code: {lowest_code}")
         
-        msg = EmailMessage()
-        msg["Subject"] = "Weather Alert Notice 🌧️"
-        msg["From"] = own_email
-        msg["To"] = to_email
-        msg.set_content("It's going to rain today. Remember to bring an umbrella. 🌧️☔")
+        payload = {
+            "content": f"⚠️ **WEATHER ALERT:** It is going to rain today over your coordinate matrix sector! Remember to bring an umbrella. 🌧️☔\n*(Lowest Weather Code logged: **{lowest_code}**)*"
+        }
 
-        max_retries = 3
-        email_sent = False
-
-        for attempt in range(1, max_retries + 1):
-            try:
-                print(f"📨 [Attempt {attempt}/{max_retries}] Dispatching notification via secure SMTP_SSL (Port 465)...")
-                with smtplib.SMTP_SSL("://gmail.com", 465, timeout=15) as connection:
-                    connection.login(own_email, own_password)
-                    connection.send_message(msg)
-                print("🚀 Notification successfully pushed to destination client.")
-                email_sent = True
-                break 
-            except (smtplib.SMTPException, OSError, TimeoutError) as network_error:
-                print(f"⚠️ Network handshake failed on attempt {attempt}: {network_error}")
-                if attempt < max_retries:
-                    print("⏱️ DNS or server link unstable. Pausing 5 seconds before retrying...")
-                    time.sleep(5)
-                else:
-                    print("🔄 Primary SSL route completely exhausted. Forking emergency safety lane via TLS (Port 587)...")
-
-        if not email_sent:
-            try:
-                with smtplib.SMTP("://gmail.com", 587, timeout=15) as connection:
-                    connection.starttls()
-                    connection.login(own_email, own_password)
-                    connection.send_message(msg)
-                print("🚀 Notification successfully pushed to destination client via emergency TLS channel.")
-            except Exception as final_crash:
-                print(f"❌ Critical Mail Delivery Collapse: All network routing layers rejected connection. Info: {final_crash}")
-                exit(1)
-                
+        print("📨 Dispatching webhook payload to Discord channel over HTTPS (Port 443)...")
+        webhook_response = requests.post(discord_webhook_url, json=payload, timeout=15)
+        
+        if webhook_response.status_code in:
+            print("🚀 Notification successfully pushed to Discord client canvas!")
+        else:
+            print(f"❌ Webhook communication failed with status: {webhook_response.status_code}")
+            exit(1)
+            
     else:
         print(f"☀️ No precipitation vectors logged inside this 12-hour horizon (Lowest Code: {lowest_code}).")
         print("✅ Run complete. System exiting cleanly.")
 
 except requests.RequestException as network_fail:
-    print(f"❌ Network Telemetry Failure: Unable to fetch weather data matrices. Details: {network_fail}")
+    print(f"❌ Network Telemetry Failure: Details: {network_fail}")
     exit(1)
 except Exception as unexpected_error:
-    print(f"⚠️ Critical System Error encountered during runtime execution: {unexpected_error}")
+    print(f"⚠️ Critical System Error encountered: {unexpected_error}")
     exit(1)
 
